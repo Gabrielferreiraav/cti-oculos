@@ -1,0 +1,7 @@
+# Vídeos pesados de referência
+*.mp4
+
+# Arquivos temporários e de sistema
+.DS_Store
+Thumbs.db
+*.log
