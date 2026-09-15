@@ -1,6 +1,6 @@
 /**
  * CTI DOS ÓCULOS - Interatividade e Boas Práticas Web
- * Menu expansível, rolagem suave, navegação ativa e acessibilidade
+ * Menu expansível limpo, rolagem suave, navegação ativa e acessibilidade
  */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -8,17 +8,15 @@ document.addEventListener('DOMContentLoaded', () => {
   const menuDropdown = document.getElementById('menuDropdown');
   const navLinks = document.querySelectorAll('.nav-link, .menu-cta-btn');
 
-  // Toggle do Menu Hambúrguer
+  /* ------------------------------------------------------------------ */
+  /* MENU HAMBÚRGUER (DROPDOWN LIMPO E SEM OFUSCAMENTO)                 */
+  /* ------------------------------------------------------------------ */
   if (menuToggle && menuDropdown) {
+
     menuToggle.addEventListener('click', (e) => {
       e.stopPropagation();
       const isOpen = menuDropdown.classList.contains('is-open');
-      
-      if (isOpen) {
-        closeMenu();
-      } else {
-        openMenu();
-      }
+      isOpen ? closeMenu() : openMenu();
     });
 
     // Fechar ao clicar fora do menu
@@ -58,33 +56,39 @@ document.addEventListener('DOMContentLoaded', () => {
     menuToggle.setAttribute('aria-expanded', 'false');
   }
 
-  // Active Link Highlight com IntersectionObserver
+  /* ------------------------------------------------------------------ */
+  /* ACTIVE LINK HIGHLIGHT (Scroll e IntersectionObserver)             */
+  /* ------------------------------------------------------------------ */
   const sections = document.querySelectorAll('section[id]');
   const menuNavLinks = document.querySelectorAll('.nav-link');
 
-  if ('IntersectionObserver' in window && sections.length > 0) {
-    const observerOptions = {
-      root: null,
-      rootMargin: '-30% 0px -60% 0px',
-      threshold: 0
-    };
-
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          const activeId = entry.target.getAttribute('id');
-          menuNavLinks.forEach(link => {
-            const href = link.getAttribute('href');
-            if (href === `#${activeId}`) {
-              link.classList.add('active');
-            } else {
-              link.classList.remove('active');
-            }
-          });
-        }
+  function updateActiveLink() {
+    // Se estiver no topo da página, força "Início" como ativo
+    if (window.scrollY < 120) {
+      menuNavLinks.forEach(link => {
+        link.classList.toggle('active', link.getAttribute('href') === '#inicio');
       });
-    }, observerOptions);
+      return;
+    }
 
-    sections.forEach(sec => observer.observe(sec));
+    let currentSectionId = '';
+    const scrollPosition = window.scrollY + 200;
+
+    sections.forEach(section => {
+      const top = section.offsetTop;
+      const height = section.offsetHeight;
+      if (scrollPosition >= top && scrollPosition < top + height) {
+        currentSectionId = section.getAttribute('id');
+      }
+    });
+
+    if (currentSectionId) {
+      menuNavLinks.forEach(link => {
+        link.classList.toggle('active', link.getAttribute('href') === `#${currentSectionId}`);
+      });
+    }
   }
+
+  window.addEventListener('scroll', updateActiveLink, { passive: true });
+  updateActiveLink();
 });
